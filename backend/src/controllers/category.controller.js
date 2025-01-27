@@ -8,7 +8,7 @@ const addcategory = asyncHandler( async (req, res) => {
    
 
 
-    const { category, sequence } = req.body
+    const { category, sequence, status } = req.body
 
 
     
@@ -50,6 +50,7 @@ const addcategory = asyncHandler( async (req, res) => {
         categoryname: category.toLowerCase(),
         avatar: avatar.url,
         sequence: sequence,
+        status: status
         
     })
 
@@ -80,4 +81,11 @@ const deletecategory = asyncHandler(async(req, res) => {
     );
 });
 
-export { addcategory, deletecategory };
+const getCategories = asyncHandler(async(req, res) => {
+    const categories = await Category.find();
+    return res.status(200).json(
+        new ApiResponse(200, categories, "Categories fetched successfully")
+    );
+});
+
+export { addcategory, deletecategory, getCategories };

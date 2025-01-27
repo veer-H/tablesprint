@@ -15,36 +15,26 @@ const addsubcategory = asyncHandler( async (req, res) => {
     
 
     if (
-        [subCategory, catagory, sequence].some((field) => field?.trim() === "")
+        [subCategory, catagory, sequence].some((field) =>typeof field === 'string' && field?.trim() === "")
     ) {
         throw new ApiError(400, "All fields are required")
     }
 
-    const existedsubCategory = await SubCategory.findOne({
-        $or: [{ subCategory }, { catagory }]
-    })
+    const existedsubCategory = await SubCategory.findOne({  subcategoryname: subCategory }
+    )
 
     if (existedsubCategory) {
         throw new ApiError(409, "subCategory with subCategory or catagory already exists")
     }
    
 
-    const avatarLocalPath = req.files?.avatar[0]?.path;
+    
    
 
 
     
 
-    if (!avatarLocalPath) {
-        throw new ApiError(400, "Avatar file is required")
-    }
-
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
-    
-
-    if (!avatar) {
-        throw new ApiError(400, "Avatar file is required")
-    }
+   
    
     const categoryId = await Category.findOne({
         categoryname: catagory
@@ -52,7 +42,6 @@ const addsubcategory = asyncHandler( async (req, res) => {
     
     const createdsubCategory = await SubCategory.create({
         subcategoryname: subCategory.toLowerCase(),
-        avatar: avatar.url,
         categoryname: categoryId._id,
         sequence: sequence,
         
@@ -136,4 +125,11 @@ const deletesubcategory = asyncHandler(async(req, res) => {
     );
 });
 
-export { addsubcategory, editsubcategory, deletesubcategory };
+const getsubcategories = asyncHandler(async(req, res) => {
+    const subcategories = await SubCategory.find().populate("categoryname");
+    return res.status(200).json(
+        new ApiResponse(200, subcategories, "Subcategories fetched successfully")
+    );
+});
+
+export { addsubcategory, editsubcategory, deletesubcategory, getsubcategories };

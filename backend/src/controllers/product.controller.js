@@ -4,6 +4,7 @@ import { Product } from "../models/product.model.js";
 //import { Category } from "../models/category.model.js";
 import { SubCategory } from "../models/subcatogary.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { Category } from "../models/category.model.js";
 
 
 const addproduct = asyncHandler( async (req, res) => {
@@ -41,4 +42,18 @@ const addproduct = asyncHandler( async (req, res) => {
     
 } )
 
-export {addproduct}
+const getproducts = asyncHandler(async(req, res) => {
+    const products = await Product.find().populate({
+        
+            path: "SubCategory",
+            populate: {
+                path: "categoryname",
+                model: "Category"
+            }
+    })
+    return res.status(200).json(
+        new ApiResponse(200, products, "Products fetched successfully")
+    );
+});
+
+export {addproduct, getproducts}
